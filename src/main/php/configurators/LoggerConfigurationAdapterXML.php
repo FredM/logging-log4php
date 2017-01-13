@@ -133,7 +133,11 @@ class LoggerConfigurationAdapterXML implements LoggerConfigurationAdapter
 		if (count($node->param) > 0) {
 			$appender['params'] = $this->parseParameters($node);
 		}
-		
+
+		if (count($node->paramEnv) > 0) {
+			$appender['params'] += $this->parseEnvironmentParameters($node);
+		}
+
 		foreach($node->filter as $filterNode) {
 			$appender['filters'][] = $this->parseFilter($filterNode);
 		}
@@ -145,13 +149,19 @@ class LoggerConfigurationAdapterXML implements LoggerConfigurationAdapter
 	private function parseLayout(SimpleXMLElement $node, $appenderName) {
 		$layout = array();
 		$layout['class'] = $this->getAttributeValue($node, 'class');
-		
+
+        $layout['params'] = [];
 		if (count($node->param) > 0) {
 			$layout['params'] = $this->parseParameters($node);
 		}
-		
+
+        if (count($node->paramEnv) > 0) {
+            $layout['params'] += $this->parseEnvironmentParameters($node);
+        }
+
 		return $layout;
-	}
+	}
+
 	/** Parses any <param> child nodes returning them in an array. */
 	private function parseParameters($paramsNode) {
 		$params = array();
@@ -170,7 +180,27 @@ class LoggerConfigurationAdapterXML implements LoggerConfigurationAdapter
 
 		return $params;
 	}
-	
+
+	/** Parses any <paramEnv> child nodes returning them in an array. */
+	private function parseEnvironmentParameters($paramsNode) {
+		$params = array();
+
+		foreach($paramsNode->paramEnv as $paramNode) {
+			if (empty($paramNode['name'])) {
+				$this->warn("A <paramEnv> node is missing the required 'name' attribute. Skipping parameter.");
+				continue;
+			}
+			if (empty($paramNode['key'])) {
+				$this->warn("A <paramEnv> node is missing the required 'key' attribute. Skipping parameter.");
+				continue;
+			}
+
+			$params[$this->getAttributeValue($paramNode, 'key')] = getenv($this->getAttributeValue($paramNode, 'name'));
+		}
+
+		return $params;
+	}
+
 	/** Parses a <root> node. */
 	private function parseRootLogger(SimpleXMLElement $node) {
 		$logger = array();
