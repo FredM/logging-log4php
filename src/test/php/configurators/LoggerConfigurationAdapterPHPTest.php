@@ -65,7 +65,7 @@ class LoggerConfigurationAdapterPHPTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * Test exception is thrown when file is not valid.
 	 * @expectedException LoggerException
-	 * @expectedExceptionMessage Error parsing configuration: syntax error
+	 * @expectedExceptionMessage Error parsing configuration: parse error
 	 */
 	public function testInvalidFileWarning() {
 		$url = PHPUNIT_CONFIG_DIR . '/adapters/php/config_invalid_syntax.php';
