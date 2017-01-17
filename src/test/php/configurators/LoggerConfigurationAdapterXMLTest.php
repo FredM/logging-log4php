@@ -36,6 +36,7 @@ class LoggerConfigurationAdapterXMLTest extends PHPUnit_Framework_TestCase {
 				'class' => 'LoggerAppenderEcho',
 				'layout' => array(
 					'class' => 'LoggerLayoutTTCC',
+                    'params' => Array ()
 				),
 				'filters' => array(
 					array(
